@@ -21,15 +21,9 @@
 // DE ACCIONES EN EL SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Text;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RichText_Editor
@@ -38,15 +32,29 @@ namespace RichText_Editor
     {
         #region Constantes
 
-        private const string NombreFuentePredeterminada = "Calibri";
+        /// <summary>
+        ///   Establece la familia fuente predeterminada con que iniciara el editor.
+        /// </summary>
+        private const string FamiliaFuentePredeterminada = "Calibri";
+
+        /// <summary>
+        ///   Establece el tamaño de la fuente predeterminada con que iniciara el editor.
+        /// </summary>
         private const int TamanoFuentePredeterminada = 15;
 
         #endregion Constantes
 
         #region Miembros Privados
 
+        /// <summary>
+        ///   Control donde cuenta la cantidad de pestañas activas en el editor.
+        /// </summary>
         private int m_intConteoPestanas = 0;
-        private Font m_fontFuenteSeleccionada;
+
+        /// <summary>
+        ///   Control donde almacena la familia fuente utilizada para su uso posterior.
+        /// </summary>
+        private Font m_fontFamiliaFuenteSeleccionada;
 
         #endregion
 
@@ -57,8 +65,8 @@ namespace RichText_Editor
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            this.m_fontFuenteSeleccionada = ObtenerFuentePredeterminado();
-            tabControlMain.ContextMenuStrip = contextMenuStripPestana;
+            this.m_fontFamiliaFuenteSeleccionada = ObtenerFuentePredeterminado();
+            tabControlPrincipal.ContextMenuStrip = contextMenuStripPestana;
 
             AgregarPestana();
             ObtenerColeccionFuente();
@@ -67,9 +75,13 @@ namespace RichText_Editor
 
         #region Propiedades
 
+        /// <summary>
+        ///   Propiedad donde se consulta el control RichTextBox que esta dentro de la pestaña
+        ///   seleccionada actualmente por el usuario.
+        /// </summary>
         public RichTextBox ObtenerDocumentoActual
         {
-            get { return (RichTextBox)tabControlMain.SelectedTab.Controls["Cuerpo"]; }
+            get { return (RichTextBox)tabControlPrincipal.SelectedTab.Controls["Cuerpo"]; }
         }
 
         #endregion Propiedades
@@ -78,116 +90,140 @@ namespace RichText_Editor
 
         #region Pestañas
 
+        /// <summary>
+        ///   Metodo que instancia un nuevo documento sin contenido dentro de una nueva pestaña.
+        /// </summary>
         private void AgregarPestana()
         {
+            // Se instancia un nuevo RichTextBox con las siguientes valores establecidas
+            // dentro de sus propiedades.
             RichTextBox Cuerpo = new RichTextBox
             {
                 Name = "Cuerpo",
                 AcceptsTab = true,
                 Dock = DockStyle.Fill,
                 ContextMenuStrip = contextMenuStripDocumento,
-                Font = this.m_fontFuenteSeleccionada
+                Font = this.m_fontFamiliaFuenteSeleccionada
             };
 
+            // Se incrementa el conteo de pestañas...
             this.m_intConteoPestanas++;
-            string TextoDocumento = "Documento " + this.m_intConteoPestanas;
 
+            // Se genera un nombre para el nuevo documento.
+            string TextoDocumento = "Sin título-" + this.m_intConteoPestanas;
+
+            // Se crea la nueva pestaña (TabPage) con el nombre del nuevo documento como su titulo
+            // y nombre del nuevo control.
             TabPage NuevaPagina = new TabPage
             {
                 Name = TextoDocumento,
                 Text = TextoDocumento
             };
 
+            // Se agrega el nuevo RichTextBox dentro de la nueva pestaña (TabPage).
             NuevaPagina.Controls.Add(Cuerpo);
-            tabControlMain.TabPages.Add(NuevaPagina);
+
+            // Se agrega la nueva pestaña (TabPage) dentro del control de pestañas (TabControl).
+            tabControlPrincipal.TabPages.Add(NuevaPagina);
         }
 
-        private void AgregarPestana(string Texto)
-        {
-            RichTextBox Cuerpo = new RichTextBox
-            {
-                Name = "Cuerpo",
-                AcceptsTab = true,
-                Dock = DockStyle.Fill,
-                ContextMenuStrip = contextMenuStripDocumento,
-                Text = Texto,
-                Font = this.m_fontFuenteSeleccionada
-            };
-
-            this.m_intConteoPestanas++;
-            string TextoDocumento = "Documento " + this.m_intConteoPestanas;
-
-            TabPage NuevaPagina = new TabPage
-            {
-                Name = TextoDocumento,
-                Text = TextoDocumento
-            };
-
-            NuevaPagina.Controls.Add(Cuerpo);
-            tabControlMain.TabPages.Add(NuevaPagina);
-        }
-
-    
-      
-
+        /// <summary>
+        ///   Metodo que elimina la pestaña actual seleccionada.
+        /// </summary>
         private void EliminarPestana()
         {
-            if (tabControlMain.TabPages.Count != 1)
+            if (tabControlPrincipal.TabPages.Count != 1)
             {
-                tabControlMain.TabPages.Remove(tabControlMain.SelectedTab);
+                tabControlPrincipal.TabPages.Remove(tabControlPrincipal.SelectedTab);
             }
             else
             {
-                tabControlMain.TabPages.Remove(tabControlMain.SelectedTab);
+                tabControlPrincipal.TabPages.Remove(tabControlPrincipal.SelectedTab);
                 this.m_intConteoPestanas = 0;
                 AgregarPestana();
             }
         }
 
+        /// <summary>
+        ///   Metodo que elimina todas las pestañas activas dentro del editor.
+        /// </summary>
         private void EliminarTodasLasPestanas()
         {
-            foreach (TabPage Page in tabControlMain.TabPages)
+            foreach (TabPage Page in tabControlPrincipal.TabPages)
             {
-                tabControlMain.TabPages.Remove(Page);
+                tabControlPrincipal.TabPages.Remove(Page);
             }
             this.m_intConteoPestanas = 0;
             AgregarPestana();
         }
 
+        /// <summary>
+        ///   Método que elimina todas las pestañas activas, ha excepción de la pestaña
+        ///   actual seleccionada por el usuario.
+        /// </summary>
         private void EliminarTodasLasPestanasMenosEsta()
         {
-            foreach (TabPage Page in tabControlMain.TabPages)
+            foreach (TabPage Page in tabControlPrincipal.TabPages)
             {
-                if (Page.Name != tabControlMain.SelectedTab.Name)
+                if (Page.Name != tabControlPrincipal.SelectedTab.Name)
                 {
-                    tabControlMain.TabPages.Remove(Page);
+                    tabControlPrincipal.TabPages.Remove(Page);
                 }
             }
+        }
+
+        /// <summary>
+        ///   Método que elimina todas las pestañas posteriores a la pestaña seleccionada
+        ///   por el usuario.
+        /// </summary>
+        private void EliminarPestanasPosteriores()
+        {
+            for (int i = tabControlPrincipal.TabCount - 1; i > tabControlPrincipal.SelectedIndex; i--)
+            {
+                tabControlPrincipal.TabPages.RemoveAt(i);
+            }
+        }
+
+        /// <summary>
+        ///   Método que elimina todas las pestañas donde su contenido ya han sido guardadas por el usuario.
+        /// </summary>
+        private void EliminarPestanasGuardadas()
+        {
+
         }
 
         #endregion Pestañas
 
         #region Guardar&Abrir
 
+        /// <summary>
+        ///   Método que abre un archivo existente.
+        /// </summary>
         private void Abrir()
         {
             openFileDialogDocumento.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            openFileDialogDocumento.Filter = "Formato de texto enriquecido(RTF) | *.rtf";
+            openFileDialogDocumento.Filter = "Formato de texto enriquecido (RTF)|*.rtf";
 
             if (openFileDialogDocumento.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                // Si se selecciono un nombre de archivo valido...
                 if (openFileDialogDocumento.FileName.Length > 0)
                 {
                     try
                     {
+                        // Se genera una nueva pestaña.
                         AgregarPestana();
 
-                        tabControlMain.SelectedTab = tabControlMain.TabPages["Documento " + this.m_intConteoPestanas];
+                        // Se busca y se selecciona la nueva pestaña generada.
+                        tabControlPrincipal.SelectedTab = tabControlPrincipal.TabPages["Sin título-" + this.m_intConteoPestanas];
 
+                        // Carga el contenido del archivo en el RichTextBox de la nueva pestaña.
                         ObtenerDocumentoActual.LoadFile(openFileDialogDocumento.FileName, RichTextBoxStreamType.RichText);
-                        string filename = Path.GetFileName(openFileDialogDocumento.FileName);
-                        tabControlMain.SelectedTab.Text = filename;
-                        tabControlMain.SelectedTab.Name = filename;
+                        
+                        // Se establece el nombre del archivo en el titulo de la pestaña y el nombre de la misma.
+                        string NombreArchivo = Path.GetFileName(openFileDialogDocumento.FileName);
+                        tabControlPrincipal.SelectedTab.Text = NombreArchivo;
+                        tabControlPrincipal.SelectedTab.Name = NombreArchivo;
                     }
                     catch (Exception e)
                     {
@@ -197,23 +233,31 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Método que guarda el documento activo.
+        /// </summary>
         private void Guardar()
         {
-            saveFileDialogDocumento.FileName = tabControlMain.SelectedTab.Name;
+
+            saveFileDialogDocumento.FileName = tabControlPrincipal.SelectedTab.Name;
             saveFileDialogDocumento.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             saveFileDialogDocumento.Filter = "Formato de texto enriquecido (RTF)|*.rtf";
             saveFileDialogDocumento.Title = "Guardar";
 
             if (saveFileDialogDocumento.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                // Si se selecciono un nombre de archivo valido...
                 if (saveFileDialogDocumento.FileName.Length > 0)
                 {
                     try
                     {
+                        // Guarda el contenido del RichTextBox en la ruta del archivo establecida.
                         ObtenerDocumentoActual.SaveFile(saveFileDialogDocumento.FileName, RichTextBoxStreamType.RichText);
-                        string filename = Path.GetFileName(saveFileDialogDocumento.FileName);
-                        tabControlMain.SelectedTab.Text = filename;
-                        tabControlMain.SelectedTab.Name = filename;
+
+                        // Se establece el nombre del archivo en el titulo de la pestaña y el nombre de la misma.
+                        string NombreArchivo = Path.GetFileName(saveFileDialogDocumento.FileName);
+                        tabControlPrincipal.SelectedTab.Text = NombreArchivo;
+                        tabControlPrincipal.SelectedTab.Name = NombreArchivo;
                     }
                     catch (Exception e)
                     {
@@ -223,23 +267,30 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Método que guarda el documento con un nuevo nombre o formato.
+        /// </summary>
         private void GuardarComo()
         {
-            saveFileDialogDocumento.FileName = tabControlMain.SelectedTab.Name;
+            saveFileDialogDocumento.FileName = tabControlPrincipal.SelectedTab.Name;
             saveFileDialogDocumento.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            saveFileDialogDocumento.Filter = "Formato de texto enriquecido (RTF)|*.rtf|Documentos de texto (*.txt)|*.txt";
+            saveFileDialogDocumento.Filter = "Formato de texto enriquecido (RTF)|*.rtf";
             saveFileDialogDocumento.Title = "Guardar como";
 
             if (saveFileDialogDocumento.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                // Si se selecciono un nombre de archivo valido...
                 if (saveFileDialogDocumento.FileName.Length > 0)
                 {
                     try
                     {
+                        // Guarda el contenido del RichTextBox en la ruta del archivo establecida.
                         ObtenerDocumentoActual.SaveFile(saveFileDialogDocumento.FileName, RichTextBoxStreamType.RichText);
-                        string filename = Path.GetFileName(saveFileDialogDocumento.FileName);
-                        tabControlMain.SelectedTab.Text = filename;
-                        tabControlMain.SelectedTab.Name = filename;
+
+                        // Se establece el nombre del archivo en el titulo de la pestaña y el nombre de la misma.
+                        string NombreArchivo = Path.GetFileName(saveFileDialogDocumento.FileName);
+                        tabControlPrincipal.SelectedTab.Text = NombreArchivo;
+                        tabControlPrincipal.SelectedTab.Name = NombreArchivo;
                     }
                     catch (Exception e)
                     {
@@ -254,45 +305,62 @@ namespace RichText_Editor
 
         #region Texto
 
+        /// <summary>
+        ///   Método que deshace la última acción hecha por el usuario.
+        /// </summary>
         private void Deshacer()
         {
             ObtenerDocumentoActual.Undo();
         }
 
+        /// <summary>
+        ///   Método que rehace la última acción hecha por el usuario.
+        /// </summary>
         private void Rehacer()
         {
             ObtenerDocumentoActual.Redo();
         }
 
+        /// <summary>
+        ///   Método que corta la selección del lienzo y la coloca en el Portapapeles.
+        /// </summary>
         private void Cortar()
         {
             ObtenerDocumentoActual.Cut();
         }
 
+        /// <summary>
+        ///   Método que copia la selección del lienzo y la coloca en el Portapapeles.
+        /// </summary>
         private void Copiar()
         {
             ObtenerDocumentoActual.Copy();
         }
 
+        /// <summary>
+        ///   Método que pega el contenido del Portapapeles.
+        /// </summary>
         private void Pegar()
         {
             ObtenerDocumentoActual.Paste();
         }
 
+        /// <summary>
+        ///   Método que selecciona todo el texto del documento actual.
+        /// </summary>
         private void SeleccionarTodo()
         {
             ObtenerDocumentoActual.SelectAll();
-        }
-
-        private void EstablecerEstiloFuente(FontStyle estiloFuente)
-        {
-
         }
 
         #endregion Texto
 
         #region General
 
+        /// <summary>
+        ///   Método para obtener todas las familias fuente instaladas en el sistema,
+        ///   y establecerlas en el control toolStripComboBoxFamiliaFuentes.
+        /// </summary>
         private void ObtenerColeccionFuente()
         {
             InstalledFontCollection FuenteIns = new InstalledFontCollection();
@@ -302,21 +370,30 @@ namespace RichText_Editor
                 toolStripComboBoxFamiliaFuentes.Items.Add(item.Name);
             }
 
-            toolStripComboBoxFamiliaFuentes.SelectedIndex = toolStripComboBoxFamiliaFuentes.FindString(NombreFuentePredeterminada);
+            toolStripComboBoxFamiliaFuentes.SelectedIndex = toolStripComboBoxFamiliaFuentes.FindString(FamiliaFuentePredeterminada);
         }
 
+        /// <summary>
+        ///   Método para establecer los valores que representaran los tamaños de la fuente
+        ///   dentro del control toolStripComboBoxTamanoFuente.
+        /// </summary>
         private void TamanosFuente()
         {
             for (int i = 0; i <= 75; i++)
             {
                 toolStripComboBoxTamanoFuente.Items.Add(i);
             }
+
             toolStripComboBoxTamanoFuente.SelectedIndex = TamanoFuentePredeterminada;
         }
 
+        /// <summary>
+        ///   Método para obtener la familia fuente predeterminada.
+        /// </summary>
+        /// <returns>Devuelve un <see cref="Font"/> que representa la familia fuente predeterminada.</returns>
         private Font ObtenerFuentePredeterminado()
         {
-            return new Font(NombreFuentePredeterminada, TamanoFuentePredeterminada, FontStyle.Regular);
+            return new Font(FamiliaFuentePredeterminada, TamanoFuentePredeterminada, FontStyle.Regular);
         }
 
         #endregion General
@@ -390,6 +467,10 @@ namespace RichText_Editor
 
         #region ToolStripPanelSuperior Eventos
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonNegrita;
+        ///   cambia una fuente en negrita.
+        /// </summary>
         private void toolStripButtonNegrita_Click(object sender, EventArgs e)
         {
             Font FuenteRegular = new Font(ObtenerDocumentoActual.SelectionFont.FontFamily,
@@ -408,6 +489,10 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonCursiva;
+        ///   cambia una fuente en cursiva.
+        /// </summary>
         private void toolStripButtonCursiva_Click(object sender, EventArgs e)
         {
             Font FuenteRegular = new Font(ObtenerDocumentoActual.SelectionFont.FontFamily,
@@ -426,6 +511,10 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonSubrayado;
+        ///   dibuja una línea debajo del texto.
+        /// </summary>
         private void toolStripButtonSubrayado_Click(object sender, EventArgs e)
         {
             Font FuenteRegular = new Font(ObtenerDocumentoActual.SelectionFont.FontFamily,
@@ -444,6 +533,10 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonTachado;
+        ///   dibuja una línea en medio del texto.
+        /// </summary>
         private void toolStripButtonTachado_Click(object sender, EventArgs e)
         {
             Font FuenteRegular = new Font(ObtenerDocumentoActual.SelectionFont.FontFamily,
@@ -462,16 +555,28 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonMayusculas;
+        ///   convierte el texto en mayúsculas.
+        /// </summary>
         private void toolStripButtonMayusculas_Click(object sender, EventArgs e)
         {
             ObtenerDocumentoActual.SelectedText = ObtenerDocumentoActual.SelectedText.ToUpper();
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonMinusculas;
+        ///   convierte el texto en minúsculas.
+        /// </summary>
         private void toolStripButtonMinusculas_Click(object sender, EventArgs e)
         {
             ObtenerDocumentoActual.SelectedText = ObtenerDocumentoActual.SelectedText.ToLower();
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAgrandarFuente;
+        ///   aumenta el tamaño de la fuente.
+        /// </summary>
         private void toolStripButtonAgrandarFuente_Click(object sender, EventArgs e)
         {
             float NuevoTamanoFuente = ObtenerDocumentoActual.SelectionFont.SizeInPoints + 2;
@@ -479,10 +584,14 @@ namespace RichText_Editor
             Font NuevoTamano = new Font(ObtenerDocumentoActual.SelectionFont.Name,
                 NuevoTamanoFuente, ObtenerDocumentoActual.SelectionFont.Style);
 
-            this.m_fontFuenteSeleccionada = NuevoTamano;
+            this.m_fontFamiliaFuenteSeleccionada = NuevoTamano;
             ObtenerDocumentoActual.SelectionFont = NuevoTamano;
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonReducirFuente;
+        ///   reduce el tamaño de la fuente.
+        /// </summary>
         private void toolStripButtonReducirFuente_Click(object sender, EventArgs e)
         {
             float NuevoTamanoFuente = ObtenerDocumentoActual.SelectionFont.SizeInPoints - 2;
@@ -490,10 +599,14 @@ namespace RichText_Editor
             Font NuevoTamano = new Font(ObtenerDocumentoActual.SelectionFont.Name,
                 NuevoTamanoFuente, ObtenerDocumentoActual.SelectionFont.Style);
 
-            this.m_fontFuenteSeleccionada = NuevoTamano;
+            this.m_fontFamiliaFuenteSeleccionada = NuevoTamano;
             ObtenerDocumentoActual.SelectionFont = NuevoTamano;
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonColorTexto;
+        ///   cambia el color del texto.
+        /// </summary>
         private void toolStripButtonColorTexto_Click(object sender, EventArgs e)
         {
             if (colorDialogColorFuente.ShowDialog() == DialogResult.OK)
@@ -502,16 +615,24 @@ namespace RichText_Editor
             }
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el indice seleccionado cambio del control toolStripComboBoxFamiliaFuentes;
+        ///   cambia la familia de fuentes.
+        /// </summary>
         private void toolStripComboBoxFamiliaFuentes_SelectedIndexChanged(object sender, EventArgs e)
         {
             Font NuevaFuente = new Font(toolStripComboBoxFamiliaFuentes.SelectedItem.ToString(), 
                 ObtenerDocumentoActual.SelectionFont.Size, 
                 ObtenerDocumentoActual.SelectionFont.Style);
 
-            this.m_fontFuenteSeleccionada = NuevaFuente;
+            this.m_fontFamiliaFuenteSeleccionada = NuevaFuente;
             ObtenerDocumentoActual.SelectionFont = NuevaFuente;
         }
 
+        /// <summary>
+        ///   Evento que se activa cuando el indice seleccionado cambio del control toolStripComboBoxTamanoFuente;
+        ///   cambia el tamaño de la fuente.
+        /// </summary>
         private void toolStripComboBoxTamanoFuente_SelectedIndexChanged(object sender, EventArgs e)
         {
             float NuevoTamano;
@@ -521,7 +642,7 @@ namespace RichText_Editor
             Font NuevaFuente = new Font(ObtenerDocumentoActual.SelectionFont.Name, NuevoTamano,
                 ObtenerDocumentoActual.SelectionFont.Style);
 
-            this.m_fontFuenteSeleccionada = NuevaFuente;
+            this.m_fontFamiliaFuenteSeleccionada = NuevaFuente;
             ObtenerDocumentoActual.SelectionFont = NuevaFuente;
         }
 
@@ -621,12 +742,12 @@ namespace RichText_Editor
 
         private void cerrarALaDerechaToolStripMenuItemContext_Click(object sender, EventArgs e)
         {
-            // EliminarPestanasPosteriores();
+            EliminarPestanasPosteriores();
         }
 
         private void cerrarGuardadosToolStripMenuItemContext_Click(object sender, EventArgs e)
         {
-            // EliminarPestanasGuardadas();
+            EliminarPestanasGuardadas();
         }
 
         private void cerrarTodoToolStripMenuItemContext_Click(object sender, EventArgs e)
@@ -638,6 +759,10 @@ namespace RichText_Editor
 
         #region TimerPrincipal Eventos
 
+        /// <summary>
+        ///   <see cref="Timer"/> que se encarga de verificar la cantidad de caracteres que contiene
+        ///   dentro del documento actual.
+        /// </summary>
         private void timerPrincipal_Tick(object sender, EventArgs e)
         {
             if (ObtenerDocumentoActual != null)

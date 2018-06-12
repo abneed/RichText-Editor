@@ -33,7 +33,7 @@
             this.toolStripContainerPrincipal = new System.Windows.Forms.ToolStripContainer();
             this.statusStripPanelInferior = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelCantidadCaracteresDocumentoActual = new System.Windows.Forms.ToolStripStatusLabel();
-            this.tabControlMain = new System.Windows.Forms.TabControl();
+            this.tabControlPrincipal = new System.Windows.Forms.TabControl();
             this.toolStripPanelIzquierdo = new System.Windows.Forms.ToolStrip();
             this.nuevoToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.cerrarToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -134,7 +134,7 @@
             // 
             // toolStripContainerPrincipal.ContentPanel
             // 
-            this.toolStripContainerPrincipal.ContentPanel.Controls.Add(this.tabControlMain);
+            this.toolStripContainerPrincipal.ContentPanel.Controls.Add(this.tabControlPrincipal);
             this.toolStripContainerPrincipal.ContentPanel.Size = new System.Drawing.Size(611, 335);
             this.toolStripContainerPrincipal.Dock = System.Windows.Forms.DockStyle.Fill;
             // 
@@ -168,14 +168,14 @@
             this.toolStripStatusLabelCantidadCaracteresDocumentoActual.Size = new System.Drawing.Size(13, 17);
             this.toolStripStatusLabelCantidadCaracteresDocumentoActual.Text = "0";
             // 
-            // tabControlMain
+            // tabControlPrincipal
             // 
-            this.tabControlMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControlMain.Location = new System.Drawing.Point(0, 0);
-            this.tabControlMain.Name = "tabControlMain";
-            this.tabControlMain.SelectedIndex = 0;
-            this.tabControlMain.Size = new System.Drawing.Size(611, 335);
-            this.tabControlMain.TabIndex = 0;
+            this.tabControlPrincipal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControlPrincipal.Location = new System.Drawing.Point(0, 0);
+            this.tabControlPrincipal.Name = "tabControlPrincipal";
+            this.tabControlPrincipal.SelectedIndex = 0;
+            this.tabControlPrincipal.Size = new System.Drawing.Size(611, 335);
+            this.tabControlPrincipal.TabIndex = 0;
             // 
             // toolStripPanelIzquierdo
             // 
@@ -822,7 +822,7 @@
             this.cerrarGuardadosToolStripMenuItemContext,
             this.cerrarTodoToolStripMenuItemContext});
             this.contextMenuStripPestana.Name = "contextMenuStripPestana";
-            this.contextMenuStripPestana.Size = new System.Drawing.Size(173, 136);
+            this.contextMenuStripPestana.Size = new System.Drawing.Size(173, 114);
             // 
             // cerrarToolStripMenuItemContext
             // 
@@ -945,7 +945,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private System.Windows.Forms.ToolStripMenuItem acercadeToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton cerrarToolStripButton;
-        private System.Windows.Forms.TabControl tabControlMain;
+        private System.Windows.Forms.TabControl tabControlPrincipal;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripDocumento;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripPestana;
         private System.Windows.Forms.ToolStripMenuItem deshacerToolStripMenuItemContext;
