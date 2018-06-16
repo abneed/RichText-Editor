@@ -22,6 +22,7 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Drawing.Text;
 using System.IO;
 using System.Windows.Forms;
@@ -91,7 +92,7 @@ namespace RichText_Editor
         #region Pestañas
 
         /// <summary>
-        ///   Metodo que instancia un nuevo documento sin contenido dentro de una nueva pestaña.
+        ///   Método que instancia un nuevo documento sin contenido dentro de una nueva pestaña.
         /// </summary>
         private void AgregarPestana()
         {
@@ -128,7 +129,7 @@ namespace RichText_Editor
         }
 
         /// <summary>
-        ///   Metodo que elimina la pestaña actual seleccionada.
+        ///   Método que elimina la pestaña actual seleccionada.
         /// </summary>
         private void EliminarPestana()
         {
@@ -145,7 +146,7 @@ namespace RichText_Editor
         }
 
         /// <summary>
-        ///   Metodo que elimina todas las pestañas activas dentro del editor.
+        ///   Método que elimina todas las pestañas activas dentro del editor.
         /// </summary>
         private void EliminarTodasLasPestanas()
         {
@@ -303,6 +304,39 @@ namespace RichText_Editor
 
         #endregion Guardar&Abrir
 
+        #region Imprimir
+
+        /// <summary>
+        ///   Método que abre una ventana de dialogo para imprimir el documento actual deseado.
+        /// </summary>
+        private void Imprimir()
+        {
+            printDocumentPrincipal.DocumentName = tabControlPrincipal.SelectedTab.Name;
+
+            printDialogPrincipal.Document = printDocumentPrincipal;
+            printDialogPrincipal.AllowSelection = true;
+            printDialogPrincipal.AllowSomePages = true;
+
+            if (printDialogPrincipal.ShowDialog() == DialogResult.OK)
+                printDocumentPrincipal.Print();    
+            
+        }
+
+        /// <summary>
+        ///   Método que abre una ventana de dialogo con una vista previa de el aspecto que tendra el documento
+        ///   al imprimirse.
+        /// </summary>
+        private void VistaPreviaImprimir()
+        {
+            printDocumentPrincipal.DocumentName = tabControlPrincipal.SelectedTab.Name;
+
+            printPreviewDialogPrincipal.Document = printDocumentPrincipal;
+
+            printPreviewDialogPrincipal.ShowDialog();
+        }
+
+        #endregion Imprimir
+
         #region Texto
 
         /// <summary>
@@ -420,6 +454,16 @@ namespace RichText_Editor
         private void guardarcomoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GuardarComo();
+        }
+
+        private void imprimirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Imprimir();
+        }
+
+        private void vistapreviadeimpresiónToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            VistaPreviaImprimir();
         }
 
         private void salirToolStripMenuItem_Click(object sender, EventArgs e)
@@ -556,6 +600,79 @@ namespace RichText_Editor
         }
 
         /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAlineacionIzquierda;
+        ///   alinea el texto a la izquierda.
+        /// </summary>
+        private void toolStripButtonAlineacionIzquierda_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionAlignment = HorizontalAlignment.Left;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAlineacionCentro;
+        ///   centra el texto.
+        /// </summary>
+        private void toolStripButtonAlineacionCentro_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionAlignment = HorizontalAlignment.Center;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAlineacionDerecha;
+        ///   alinea el texto a la derecha.
+        /// </summary>
+        private void toolStripButtonAlineacionDerecha_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionAlignment = HorizontalAlignment.Right;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAlineacionJustificar;
+        ///   Alinea el texto en los márgenes izquierdo y derecho agregando espacio adicional entre palabras cuando sea necesario.
+        /// </summary>
+        private void toolStripButtonJustificar_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionAlignment = HorizontalAlignment.Left;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonReducirSangria;
+        ///   reduce el nivel de sangría del párrafo.
+        /// </summary>
+        private void toolStripButtonReducirSangria_Click(object sender, EventArgs e)
+        {
+            if (ObtenerDocumentoActual.SelectionIndent != 0)
+            {
+                ObtenerDocumentoActual.SelectionIndent -= 25;
+            }
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonAumentarSangria;
+        ///   aumenta el nivel de sangría del párrafo.
+        /// </summary>
+        private void toolStripButtonAumentarSangria_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionIndent += 25;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonVinetas;
+        ///   crea una lista en el texto.
+        /// </summary>
+        private void toolStripButtonVinetas_Click(object sender, EventArgs e)
+        {
+            if (ObtenerDocumentoActual.SelectionBullet)
+            {
+                ObtenerDocumentoActual.SelectionBullet = false;
+            }
+            else
+            {
+                ObtenerDocumentoActual.SelectionBullet = true;
+            }
+        }
+
+        /// <summary>
         ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripButtonMayusculas;
         ///   convierte el texto en mayúsculas.
         /// </summary>
@@ -616,6 +733,33 @@ namespace RichText_Editor
         }
 
         /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripMenuItemAmarillo;
+        ///   hace que el texto quede resaltado con un marcador de color amarillo.
+        /// </summary>
+        private void toolStripMenuItemAmarillo_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionBackColor = Color.Yellow;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripMenuItemVerdeBrillante;
+        ///   hace que el texto quede resaltado con un marcador de color verde brillante.
+        /// </summary>
+        private void toolStripMenuItemVerdeBrillante_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionBackColor = Color.Lime;
+        }
+
+        /// <summary>
+        ///   Evento que se activa cuando el usuario haga clic sobre el control toolStripMenuItemTurquesa;
+        ///   hace que el texto quede resaltado con un marcador de color turquesa.
+        /// </summary>
+        private void toolStripMenuItemTurquesa_Click(object sender, EventArgs e)
+        {
+            ObtenerDocumentoActual.SelectionBackColor = Color.Turquoise;
+        }
+
+        /// <summary>
         ///   Evento que se activa cuando el indice seleccionado cambio del control toolStripComboBoxFamiliaFuentes;
         ///   cambia la familia de fuentes.
         /// </summary>
@@ -669,6 +813,11 @@ namespace RichText_Editor
         private void guardarToolStripButton_Click(object sender, EventArgs e)
         {
             Guardar();
+        }
+
+        private void imprimirToolStripButton_Click(object sender, EventArgs e)
+        {
+            Imprimir();
         }
 
         private void cortarToolStripButton_Click(object sender, EventArgs e)
@@ -775,7 +924,22 @@ namespace RichText_Editor
             }
         }
 
+
         #endregion TimerPrincipal Eventos
+
+        #region PrintDocumentPrincipal Eventos
+
+        /// <summary>
+        ///   Evento que se encarga de dibujar en el <see cref="PrintDocument"/> el contenido que contiene
+        ///   en el documento seleccionado por imprimir.
+        /// </summary>
+        private void printDocumentPrincipal_PrintPage(object sender, PrintPageEventArgs e)
+        {
+            e.Graphics.DrawString(ObtenerDocumentoActual.Text, ObtenerDocumentoActual.Font, Brushes.Black, 100, 20);
+            e.Graphics.PageUnit = GraphicsUnit.Inch;
+        }
+
+        #endregion PrintDocumentPrincipal Eventos
 
     }
 }
