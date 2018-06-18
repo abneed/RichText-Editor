@@ -48,12 +48,12 @@ namespace RichText_Editor
         #region Miembros Privados
 
         /// <summary>
-        ///   Control donde cuenta la cantidad de pestañas activas en el editor.
+        ///   Miembro privado donde almacena la cantidad de pestañas activas en el editor.
         /// </summary>
         private int m_intConteoPestanas = 0;
 
         /// <summary>
-        ///   Control donde almacena la familia fuente utilizada para su uso posterior.
+        ///   Miembro privado donde almacena la familia fuente utilizada para su uso posterior.
         /// </summary>
         private Font m_fontFamiliaFuenteSeleccionada;
 
