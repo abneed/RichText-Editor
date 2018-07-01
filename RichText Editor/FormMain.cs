@@ -662,14 +662,7 @@ namespace RichText_Editor
         /// </summary>
         private void toolStripButtonVinetas_Click(object sender, EventArgs e)
         {
-            if (ObtenerDocumentoActual.SelectionBullet)
-            {
-                ObtenerDocumentoActual.SelectionBullet = false;
-            }
-            else
-            {
-                ObtenerDocumentoActual.SelectionBullet = true;
-            }
+            ObtenerDocumentoActual.SelectionBullet = !ObtenerDocumentoActual.SelectionBullet;
         }
 
         /// <summary>
